@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Booking - Favour Residencies</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body class="interior-page booking-page">
+  <nav class="main-nav"><div class="nav-inner"><div class="logo">Favour Residencies</div><button id="hamburger" aria-label="Open menu">☰</button><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="rooms.html">Rooms</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li><li><a href="index.html#portfolio">Gallery</a></li><li><a href="booking.html" class="cta-link">Book Now</a></li><li><a href="sweetspot.html">Sweet Spot</a></li></ul></div></nav>
+  <div id="mobile-menu" class="mobile-menu" aria-hidden="true"><button id="close-menu" aria-label="Close menu">×</button><ul><li><a href="index.html">Home</a></li><li><a href="rooms.html">Rooms</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li><li><a href="index.html#portfolio">Gallery</a></li><li><a href="booking.html">Book Now</a></li><li><a href="sweetspot.html">Sweet Spot</a></li></ul></div>
+  <main class="info-page">
+    <section class="booking-shell">
+      <div class="intro booking-intro"><div class="eyebrow">Reservations</div><h1>How would you like to book?</h1><p>Choose the channel that suits you best. We will use your details to prepare a quick, complete booking request.</p></div>
+      <div class="booking-choice-grid">
+        <button class="booking-choice" type="button" data-channel="whatsapp"><span class="booking-choice-icon">WA</span><h3>Book with WhatsApp</h3><p>Send your request directly to our reservations team for a quick conversation.</p><span class="btn">Continue on WhatsApp</span></button>
+        <button class="booking-choice" type="button" data-channel="email"><span class="booking-choice-icon">@</span><h3>Book with Email</h3><p>Prepare a detailed enquiry and send it to the Favour Residencies reservations desk.</p><span class="btn">Continue with Email</span></button>
+      </div>
+      <p class="booking-note">Have a question first? <a href="contact.html">Contact the residence</a>.</p>
+    </section>
+  </main>
+  <div class="booking-modal" id="bookingModal" aria-hidden="true">
+    <div class="booking-dialog" role="dialog" aria-modal="true" aria-labelledby="bookingDialogTitle">
+      <button class="booking-close" type="button" aria-label="Close booking form">×</button>
+      <div class="eyebrow" id="bookingChannelLabel">Booking request</div><h2 id="bookingDialogTitle">Tell us about your stay</h2><p id="bookingDialogCopy">Add the details below and we will prepare your request.</p>
+      <form class="booking-form" id="bookingForm">
+        <label>Full name<input type="text" name="name" autocomplete="name" required></label>
+        <label>Phone number<input type="tel" name="phone" autocomplete="tel" required></label>
+        <label>Email address<input type="email" name="email" autocomplete="email" required></label>
+        <label>Room type<select name="roomType"><option>Single Room</option><option>Double Room</option><option>Studio Apartment</option><option>Gold Suite</option><option>Modern Deluxe</option></select></label>
+        <div class="booking-form-row"><label>Arrival date<input type="date" name="arrival" required></label><label>Departure date<input type="date" name="departure" required></label></div>
+        <label>Number of guests<input type="number" name="guests" min="1" value="1" required></label>
+        <label>Other requests<textarea name="requests" rows="3" placeholder="Tell us anything that will help us prepare."></textarea></label>
+        <div class="booking-form-actions"><button class="btn" type="submit" id="sendBooking">Send booking request</button><button class="btn secondary" type="button" id="saveDraft">Save draft</button></div><div class="booking-status" id="bookingStatus" role="status"></div>
+      </form>
+    </div>
+  </div>
+  <footer><div>© 2026 Favour Residencies</div><div class="footer-right">All Rights reserved</div></footer>
+  <script src="scripts.js"></script>
+  <script src="email.js"></script>
+  <script>
+    (() => {
+      const modal = document.getElementById('bookingModal'), form = document.getElementById('bookingForm'), status = document.getElementById('bookingStatus'), sendButton = document.getElementById('sendBooking');
+      let channel = 'email';
+      const roomFromUrl = new URLSearchParams(window.location.search).get('room');
+      if (roomFromUrl && [...form.roomType.options].some(option => option.value === roomFromUrl)) form.roomType.value = roomFromUrl;
+      function openBooking(selectedChannel) { channel = selectedChannel; const whatsapp = channel === 'whatsapp'; document.getElementById('bookingChannelLabel').textContent = whatsapp ? 'WhatsApp booking' : 'Email booking'; document.getElementById('bookingDialogTitle').textContent = whatsapp ? 'Start your WhatsApp request' : 'Send your email request'; document.getElementById('bookingDialogCopy').textContent = whatsapp ? 'Complete the details and WhatsApp will open with your request ready to send.' : 'Complete the details and we will send your request securely in the background.'; sendButton.textContent = whatsapp ? 'Open WhatsApp' : 'Send Email'; status.textContent = ''; modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); form.name.focus(); }
+      function closeBooking() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }
+      document.querySelectorAll('[data-channel]').forEach(button => button.addEventListener('click', () => openBooking(button.dataset.channel)));
+      document.querySelector('.booking-close').addEventListener('click', closeBooking); modal.addEventListener('click', event => { if (event.target === modal) closeBooking(); }); document.addEventListener('keydown', event => { if (event.key === 'Escape') closeBooking(); });
+      form.addEventListener('submit', async event => { event.preventDefault(); const data = new FormData(form); const message = ['Booking request - Favour Residencies', '', 'Full name: ' + data.get('name'), 'Phone: ' + data.get('phone'), 'Email: ' + data.get('email'), 'Room type: ' + data.get('roomType'), 'Arrival: ' + data.get('arrival'), 'Departure: ' + data.get('departure'), 'Guests: ' + data.get('guests'), 'Other requests: ' + (data.get('requests') || 'None')].join('\n'); if (channel === 'whatsapp') { window.location.href = 'https://wa.me/2348072350239?text=' + encodeURIComponent(message); return; } sendButton.disabled = true; sendButton.textContent = 'Sending...'; status.textContent = ''; try { await sendBookingEmail(data); status.textContent = 'Your booking request has been sent. We will be in touch shortly.'; form.reset(); } catch (error) { status.textContent = 'We could not send the request. Please check the EmailJS setup or try WhatsApp.'; } finally { sendButton.disabled = false; sendButton.textContent = 'Send Email'; } });
+      document.getElementById('saveDraft').addEventListener('click', () => { const draft = {}; new FormData(form).forEach((value, key) => draft[key] = value); localStorage.setItem('bookingDraft', JSON.stringify(draft)); status.textContent = 'Draft saved on this device.'; });
+      try { const draft = JSON.parse(localStorage.getItem('bookingDraft')); if (draft) Object.keys(draft).forEach(key => { if (form.elements[key]) form.elements[key].value = draft[key]; }); } catch (error) { /* Ignore invalid local drafts. */ }
+    })();
+  </script>
+</body>
+</html>
